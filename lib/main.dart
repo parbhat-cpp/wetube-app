@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:wetube/app/my_app.dart';
+import 'package:wetube/services/socket_service.dart';
 import 'package:wetube/services/user_service.dart';
 
 Future<void> main() async {
@@ -16,6 +17,7 @@ Future<void> main() async {
   );
 
   Get.lazyPut<UserService>(() => UserService());
+  Get.lazyPut<SocketService>(() => SocketService().init());
 
   runApp(const MyApp());
 }

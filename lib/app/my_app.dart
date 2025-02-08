@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:wetube/screens/home.dart';
 import 'package:wetube/theme/theme.dart';
 import 'package:wetube/theme/util.dart';
@@ -18,7 +19,7 @@ class MyApp extends StatelessWidget {
     TextTheme textTheme = createTextTheme(context, "Poppins", "Open Sans");
 
     MaterialTheme theme = MaterialTheme(textTheme);
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'WeTube',
       theme: brightness == Brightness.light ? theme.light() : theme.dark(),
       debugShowCheckedModeBanner: false,

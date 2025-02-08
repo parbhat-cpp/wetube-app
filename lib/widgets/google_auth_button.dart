@@ -21,7 +21,7 @@ class _GoogleAuthButtonState extends State<GoogleAuthButton> {
   }
 
   void _setupAuthListener() {
-    supabase.auth.onAuthStateChange.listen((data) {
+    supabaseClient.auth.onAuthStateChange.listen((data) {
       final event = data.event;
       if (event == AuthChangeEvent.signedIn) {
         if (context.mounted) {
@@ -59,7 +59,7 @@ class _GoogleAuthButtonState extends State<GoogleAuthButton> {
         throw 'No ID Token found.';
       }
 
-      await supabase.auth.signInWithIdToken(
+      await supabaseClient.auth.signInWithIdToken(
           provider: OAuthProvider.google,
           idToken: idToken,
           accessToken: accessToken);

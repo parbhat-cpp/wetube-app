@@ -15,7 +15,15 @@ class UserService extends GetxService {
 
       String fetchProfileUrl = '$userProfileBaseUrl/$id';
 
-      final response = await _dio.get(fetchProfileUrl);
+      final response = await _dio.get(
+        fetchProfileUrl,
+        options: dio.Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
       Map resBody = response.data;
 
       authController.setUserProfile(
@@ -23,6 +31,7 @@ class UserService extends GetxService {
         resBody['full_name'],
         resBody['username'],
         resBody['avatar_url'],
+        resBody['premium_account'],
         token,
       );
     } catch (e) {
