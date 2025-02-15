@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:wetube/controllers/auth_controller.dart';
 import 'package:wetube/screens/room.dart';
 import 'package:wetube/services/socket_service.dart';
 import 'package:wetube/services/youtube_services.dart';
@@ -23,11 +24,10 @@ class YoutubeSearch extends StatelessWidget {
     YoutubeServices youtubeServices = Get.find<YoutubeServices>();
     SocketService socketService = Get.find<SocketService>();
 
+    AuthController authController = Get.put<AuthController>(AuthController());
+
     YoutubeSearchStateManager youtubeSearchStateManager =
         Get.put<YoutubeSearchStateManager>(YoutubeSearchStateManager());
-
-    RoomStateManager roomStateManager =
-        Get.put<RoomStateManager>(RoomStateManager());
 
     return SafeArea(
       child: Scaffold(
@@ -130,6 +130,13 @@ class YoutubeSearch extends StatelessWidget {
                       ),
                       onTap: () {
                         socketService.setVideoId(videoId);
+
+                        socketService.setVideo(
+                          videoId: videoId,
+                          username:
+                              authController.userProfile.value!.username ??
+                                  authController.userProfile.value!.fullname,
+                        );
 
                         Navigator.of(context).pop();
                       },

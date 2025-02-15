@@ -6,7 +6,6 @@ import 'package:wetube/entities/user_profile.dart';
 import 'package:wetube/main.dart';
 import 'package:wetube/screens/youtube_search.dart';
 import 'package:wetube/services/socket_service.dart';
-import 'package:wetube/services/youtube_services.dart';
 import 'package:wetube/widgets/chat.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
@@ -42,7 +41,6 @@ class Room extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     SocketService socketService = Get.find<SocketService>();
-    YoutubeServices youtubeServices = Get.find<YoutubeServices>();
 
     AuthController authController = Get.put<AuthController>(AuthController());
     RoomStateManager roomStateManager =

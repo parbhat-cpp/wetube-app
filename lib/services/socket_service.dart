@@ -65,8 +65,6 @@ class SocketService extends GetxService {
 
   void setVideoId(String videoId) {
     roomStateManager.setVideo(videoId);
-    // youtubePlayerController.load(videoId);
-    // youtubePlayerController.play();
   }
 
   void registerListeners() {
@@ -133,6 +131,15 @@ class SocketService extends GetxService {
 
     socket.on('receive-message', (chat) {
       chats.add(chat);
+    });
+
+    socket.on('set-video-id', (videoData) {
+      String username = videoData['username'];
+      String videoId = videoData['videoId'];
+
+      setVideoId(videoId);
+
+      Fluttertoast.showToast(msg: '$username set new video');
     });
   }
 
@@ -226,6 +233,17 @@ class SocketService extends GetxService {
         "premium_account": user.premiumAccount,
       },
       "message": message,
+    });
+  }
+
+  void setVideo({
+    required String videoId,
+    required String username,
+  }) {
+    socket.emit('set-video', {
+      "roomId": currentRoomId.value,
+      "username": username,
+      "videoId": videoId,
     });
   }
 
