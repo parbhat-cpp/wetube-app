@@ -1,10 +1,38 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:wetube/controllers/auth_controller.dart';
+import 'package:wetube/entities/user_profile.dart';
 import 'package:wetube/main.dart';
+import 'package:wetube/screens/youtube_search.dart';
 import 'package:wetube/services/socket_service.dart';
+import 'package:wetube/services/youtube_services.dart';
+import 'package:wetube/widgets/chat.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
-class RoomStateManager extends GetxController {}
+class RoomStateManager extends GetxController {
+  Rx<TextEditingController> chatController = TextEditingController().obs;
+  YoutubePlayerController youtubePlayerController = YoutubePlayerController(
+      initialVideoId: '1BfCnjr_Vjg',
+      flags: YoutubePlayerFlags(
+        autoPlay: false,
+        mute: false,
+      ),
+    );
+
+  void setChatText(String text) {
+    chatController.value.text = text;
+  }
+
+  void setVideo(String videoId) {
+    youtubePlayerController.load(videoId);
+    youtubePlayerController.play();
+  }
+
+  void destroy() {
+    youtubePlayerController.dispose();
+  }
+}
 
 class Room extends StatelessWidget {
   Room({super.key});
@@ -13,10 +41,27 @@ class Room extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    SocketService socketService = Get.find<SocketService>();
+    YoutubeServices youtubeServices = Get.find<YoutubeServices>();
+
+    AuthController authController = Get.put<AuthController>(AuthController());
     RoomStateManager roomStateManager =
         Get.put<RoomStateManager>(RoomStateManager());
 
-    SocketService socketService = Get.find<SocketService>();
+    void handleSendMessage() {
+      String message = roomStateManager.chatController.value.text;
+      UserProfile user = UserProfile(
+        id: authController.userProfile.value!.id,
+        avatarUrl: authController.userProfile.value!.avatarUrl,
+        fullname: authController.userProfile.value!.fullname,
+        premiumAccount: authController.userProfile.value!.premiumAccount,
+        username: authController.userProfile.value!.username,
+      );
+
+      socketService.sendMessage(user: user, message: message);
+
+      roomStateManager.setChatText('');
+    }
 
     return SafeArea(
       child: Scaffold(
@@ -34,7 +79,13 @@ class Room extends StatelessWidget {
           ),
           actions: [
             IconButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => YoutubeSearch(),
+                  ),
+                );
+              },
               icon: Icon(Icons.search),
             ),
             IconButton(
@@ -42,6 +93,75 @@ class Room extends StatelessWidget {
                 _scaffoldKey.currentState!.openEndDrawer();
               },
               icon: Icon(Icons.group),
+            ),
+          ],
+        ),
+        body: Column(
+          children: [
+            YoutubePlayer(
+              controller: roomStateManager.youtubePlayerController,
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Obx(
+                  () => ListView.builder(
+                      itemCount: socketService.chats.length,
+                      itemBuilder: (context, index) {
+                        String message = socketService.chats[index]['message'];
+                        Map<String, dynamic> user =
+                            socketService.chats[index]['sendBy'];
+                        String myUserId = supabase.auth.currentSession!.user.id;
+
+                        return Row(
+                          children: [
+                            if (user['id'] == myUserId)
+                              const Spacer(
+                                flex: 1,
+                              ),
+                            ConstrainedBox(
+                              constraints: BoxConstraints(
+                                maxWidth:
+                                    MediaQuery.of(context).size.width * 0.75,
+                              ),
+                              child: Chat(
+                                text: message,
+                                username: myUserId == user['id']
+                                    ? 'Me'
+                                    : user['username'] ?? user['full_name'],
+                                isMe: myUserId == user['id'],
+                              ),
+                            ),
+                          ],
+                        );
+                      }),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(2.0),
+              child: Container(
+                padding: const EdgeInsets.all(2),
+                child: TextField(
+                  controller: roomStateManager.chatController.value,
+                  decoration: InputDecoration(
+                    hintText: 'Type a message',
+                    isDense: true,
+                    border: const OutlineInputBorder(
+                      borderSide: BorderSide(width: 1),
+                    ),
+                    suffixIcon: IconButton(
+                      onPressed: () {
+                        handleSendMessage();
+                      },
+                      icon: const Icon(Icons.send),
+                    ),
+                  ),
+                  onSubmitted: (msg) {
+                    handleSendMessage();
+                  },
+                ),
+              ),
             ),
           ],
         ),

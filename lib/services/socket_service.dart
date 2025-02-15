@@ -16,6 +16,15 @@ class SocketService extends GetxService {
   RxString currentRoomId = ''.obs;
   RxString currentRoomName = ''.obs;
   RxList roomAttendees = [].obs;
+  RxList chats = [].obs;
+
+  late RoomStateManager roomStateManager;
+
+  @override
+  void onInit() {
+    roomStateManager = Get.find<RoomStateManager>();
+    super.onInit();
+  }
 
   SocketService init() {
     socket = io.io(
@@ -26,7 +35,7 @@ class SocketService extends GetxService {
           )
           .setExtraHeaders({
             'Authorization':
-                'Bearer ${supabase.auth.currentSession!.accessToken}',
+                'Bearer ${supabase.auth.currentSession?.accessToken ?? ''}',
             'Connection': 'Upgrade',
             'Upgrade': 'websocket',
           })
@@ -52,6 +61,12 @@ class SocketService extends GetxService {
     registerListeners();
 
     return this;
+  }
+
+  void setVideoId(String videoId) {
+    roomStateManager.setVideo(videoId);
+    // youtubePlayerController.load(videoId);
+    // youtubePlayerController.play();
   }
 
   void registerListeners() {
@@ -100,6 +115,7 @@ class SocketService extends GetxService {
       currentRoomId.value = '';
       currentRoomName.value = '';
       roomAttendees.value = [];
+      chats.value = [];
 
       Get.to(Home());
     });
@@ -113,6 +129,10 @@ class SocketService extends GetxService {
 
       Fluttertoast.showToast(
           msg: '${user['username'] ?? user['full_name']} removed by the admin');
+    });
+
+    socket.on('receive-message', (chat) {
+      chats.add(chat);
     });
   }
 
@@ -165,6 +185,7 @@ class SocketService extends GetxService {
     currentRoomId.value = '';
     currentRoomName.value = '';
     roomAttendees.value = [];
+    chats.value = [];
 
     Get.to(Home());
   }
@@ -176,5 +197,41 @@ class SocketService extends GetxService {
       "roomId": currentRoomId.value,
       "userId": userId,
     });
+  }
+
+  void sendMessage({
+    required UserProfile user,
+    required String message,
+  }) {
+    socket.emit('send-message', {
+      "roomId": currentRoomId.value,
+      "user": {
+        "id": user.id,
+        "socketId": "",
+        "full_name": user.fullname,
+        "username": user.username,
+        "avatar_url": user.avatarUrl,
+        "premium_account": user.premiumAccount,
+      },
+      "message": message,
+    });
+
+    chats.add({
+      "sendBy": {
+        "id": user.id,
+        "socketId": "",
+        "full_name": user.fullname,
+        "username": user.username,
+        "avatar_url": user.avatarUrl,
+        "premium_account": user.premiumAccount,
+      },
+      "message": message,
+    });
+  }
+
+  @override
+  void onClose() {
+    roomStateManager.destroy();
+    super.onClose();
   }
 }

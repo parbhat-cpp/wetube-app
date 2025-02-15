@@ -3,8 +3,10 @@ import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:wetube/app/my_app.dart';
+import 'package:wetube/screens/room.dart';
 import 'package:wetube/services/socket_service.dart';
 import 'package:wetube/services/user_service.dart';
+import 'package:wetube/services/youtube_services.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -18,6 +20,8 @@ Future<void> main() async {
 
   Get.lazyPut<UserService>(() => UserService());
   Get.lazyPut<SocketService>(() => SocketService().init());
+  Get.lazyPut<YoutubeServices>(() => YoutubeServices());
+  Get.lazyPut<RoomStateManager>(() => RoomStateManager());
 
   runApp(const MyApp());
 }
