@@ -120,7 +120,7 @@ class Home extends StatelessWidget {
                 const SizedBox(
                   height: 10,
                 ),
-                OutlinedButton.icon(
+                ElevatedButton.icon(
                   onPressed: () => Share.share(
                     shareRoomText,
                     subject: 'Share Room',
@@ -131,7 +131,7 @@ class Home extends StatelessWidget {
                 const SizedBox(
                   width: 10,
                 ),
-                OutlinedButton(
+                ElevatedButton(
                   onPressed: () => socketService.createRoom(
                     isPublic: homeStateController.isRoomPublic.value,
                     roomId: roomId,
@@ -417,7 +417,7 @@ class Home extends StatelessWidget {
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Obx(() {
-                                    return OutlinedButton(
+                                    return ElevatedButton(
                                       onPressed:
                                           homeStateController.createTab.value
                                               ? handleCreateRoom

@@ -50,6 +50,8 @@ dependencies:
   youtube_player_flutter: ^9.1.1
   youtube_player_iframe: ^5.2.1
   flutter_settings_screens: ^0.3.4
+  flutter_regex: ^0.0.3
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

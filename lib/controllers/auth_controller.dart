@@ -11,4 +11,8 @@ class AuthController extends GetxController {
     userProfile.value!.avatarUrl = avatarUrl;
     userProfile.value!.token = token;
   }
+
+  void setAvatarUrl(String avatarUrl) {
+    userProfile.value!.avatarUrl = avatarUrl;
+  }
 }

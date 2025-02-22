@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:dio/dio.dart' as dio;
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -60,6 +63,49 @@ class UserService extends GetxService {
         ),
       );
     } catch (e) {
+      Fluttertoast.showToast(
+        msg: e.toString(),
+        toastLength: Toast.LENGTH_LONG,
+        gravity: ToastGravity.BOTTOM,
+        timeInSecForIosWeb: 1,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        fontSize: 12.0,
+      );
+    }
+  }
+
+  Future<void> updateUser(String id, String token, Map updateData) async {
+    try {
+      log(updateData.toString());
+      final AuthController authController = Get.put(AuthController());
+
+      String updateUserUrl = '$userProfileBaseUrl/$id';
+
+      final response = await _dio.patch(
+        updateUserUrl,
+        data: jsonEncode(updateData),
+        options: dio.Options(
+          headers: {
+            'Authorization': 'Bearer $token',
+          },
+        ),
+      );
+
+      Map updatedUser = response.data;
+
+      authController.setUserProfile(
+        id,
+        updatedUser['full_name'],
+        updatedUser['username'],
+        updatedUser['avatar_url'],
+        updatedUser['premium_account'],
+        token,
+      );
+
+      Fluttertoast.showToast(msg: 'User updated successfully');
+    } catch(e) {
+      log(e.toString());
       Fluttertoast.showToast(
         msg: e.toString(),
         toastLength: Toast.LENGTH_LONG,

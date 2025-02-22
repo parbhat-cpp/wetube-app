@@ -54,15 +54,15 @@ class _SettingsState extends State<Settings> {
                     const SizedBox(
                       height: 20,
                     ),
-                    OutlinedButton(
+                    ElevatedButton(
                       onPressed: () async {
                         await userService.deleteAccount(userId, token);
-                        
+
                         handleLogOut();
                       },
                       child: const Text('Yes'),
                     ),
-                    OutlinedButton(
+                    ElevatedButton(
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -92,23 +92,25 @@ class _SettingsState extends State<Settings> {
                       title: 'Edit Profile',
                       leading: Icon(Icons.manage_accounts_outlined),
                       showDivider: false,
-                      child: SettingsScreen(
-                        title: 'Edit Profile',
-                        children: <Widget>[
-                          EditProfile(),
-                        ],
-                      ),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => EditProfile(),
+                          ),
+                        );
+                      },
                     ),
                     SimpleSettingsTile(
                       title: 'About us',
                       leading: Icon(Icons.info),
                       showDivider: false,
-                      child: SettingsScreen(
-                        title: 'About us',
-                        children: <Widget>[
-                          About(),
-                        ],
-                      ),
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => About(),
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
