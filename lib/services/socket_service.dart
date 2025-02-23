@@ -36,7 +36,7 @@ class SocketService extends GetxService {
           )
           .setExtraHeaders({
             'Authorization':
-                'Bearer ${supabase.auth.currentSession?.accessToken ?? ''}',
+                'Bearer ${supabase.auth.currentSession?.accessToken}',
             'Connection': 'Upgrade',
             'Upgrade': 'websocket',
           })
