@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:wetube/controllers/auth_controller.dart';
 import 'package:wetube/main.dart';
@@ -7,6 +8,7 @@ import 'package:wetube/screens/about.dart';
 import 'package:wetube/screens/auth.dart';
 import 'package:wetube/services/user_service.dart';
 import 'package:wetube/screens/edit_profile.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -16,6 +18,36 @@ class Settings extends StatefulWidget {
 }
 
 class _SettingsState extends State<Settings> {
+  final Razorpay _razorpay = Razorpay();
+
+  @override
+  void initState() {
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
+
+    super.initState();
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    // Do something when payment succeeds
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    // Do something when payment fails
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    // Do something when an external wallet is selected
+  }
+
+  @override
+  void dispose() {
+    _razorpay.clear();
+
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final AuthController authController =
@@ -75,6 +107,13 @@ class _SettingsState extends State<Settings> {
           });
     }
 
+    void handlePayment() {
+      if (authController.userProfile.value!.premiumAccount.isNotEmpty) {
+        Fluttertoast.showToast(msg: 'Already a premium member');
+        return;
+      }
+    }
+
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
@@ -121,6 +160,7 @@ class _SettingsState extends State<Settings> {
                       title: 'Become a premium member',
                       leading: Icon(Icons.payment),
                       showDivider: false,
+                      onTap: handlePayment,
                     ),
                   ],
                 ),

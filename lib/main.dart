@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:wetube/app/my_app.dart';
 import 'package:wetube/controllers/auth_controller.dart';
 import 'package:wetube/screens/room.dart';
+import 'package:wetube/services/rooms_service.dart';
 import 'package:wetube/services/socket_service.dart';
 import 'package:wetube/services/user_service.dart';
 import 'package:wetube/services/youtube_services.dart';
@@ -24,6 +25,7 @@ Future<void> main() async {
   Get.lazyPut<AuthController>(() => AuthController());
   Get.lazyPut<SocketService>(() => SocketService().init());
   Get.lazyPut<YoutubeServices>(() => YoutubeServices());
+  Get.lazyPut<RoomService>(() => RoomService());
 
   runApp(const MyApp());
 }

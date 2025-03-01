@@ -105,7 +105,6 @@ class UserService extends GetxService {
 
       Fluttertoast.showToast(msg: 'User updated successfully');
     } catch(e) {
-      log(e.toString());
       Fluttertoast.showToast(
         msg: e.toString(),
         toastLength: Toast.LENGTH_LONG,

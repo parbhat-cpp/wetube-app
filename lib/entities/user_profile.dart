@@ -4,7 +4,7 @@ class UserProfile {
   String? username;
   String? avatarUrl;
   String token;
-  bool premiumAccount;
+  String premiumAccount;
 
   UserProfile({
     this.id = '',
@@ -12,11 +12,11 @@ class UserProfile {
     this.username = '',
     this.avatarUrl = '',
     this.token = '',
-    this.premiumAccount = false,
+    this.premiumAccount = '',
   });
 
   void setUserProfile(String id, String fullname, String username,
-      String avatarUrl, bool premiumAccount, String token) {
+      String avatarUrl, String premiumAccount, String token) {
     this.id = id;
     this.fullname = fullname;
     this.username = username;

@@ -6,6 +6,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:wetube/controllers/auth_controller.dart';
 import 'package:wetube/entities/user_profile.dart';
 import 'package:wetube/screens/auth.dart';
+import 'package:wetube/screens/public_rooms.dart';
 import 'package:wetube/screens/settings.dart';
 import 'package:wetube/services/socket_service.dart';
 import 'package:wetube/services/user_service.dart';
@@ -184,7 +185,13 @@ class Home extends StatelessWidget {
                 ),
                 actions: [
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => PublicRooms(),
+                        ),
+                      );
+                    },
                     icon: Icon(Icons.group),
                   ),
                   GestureDetector(
