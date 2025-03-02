@@ -4,7 +4,7 @@ class UserProfile {
   String? username;
   String? avatarUrl;
   String token;
-  String premiumAccount;
+  String? premiumAccount;
 
   UserProfile({
     this.id = '',

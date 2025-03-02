@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_settings_screens/flutter_settings_screens.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -9,6 +11,8 @@ import 'package:wetube/screens/auth.dart';
 import 'package:wetube/services/user_service.dart';
 import 'package:wetube/screens/edit_profile.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:dio/dio.dart' as dio;
 
 class Settings extends StatefulWidget {
   const Settings({super.key});
@@ -29,12 +33,33 @@ class _SettingsState extends State<Settings> {
     super.initState();
   }
 
-  void _handlePaymentSuccess(PaymentSuccessResponse response) {
-    // Do something when payment succeeds
+  void _handlePaymentSuccess(PaymentSuccessResponse response) async {
+    AuthController authController = Get.put<AuthController>(AuthController());
+
+    final String orderBaseUrl = '${dotenv.env['BACKEND_URL']}/order';
+    final orderResponse = await dio.Dio().post(
+      '$orderBaseUrl/create',
+      data: jsonEncode({
+        "id": response.orderId,
+        "razorpay_payment_id": response.paymentId,
+        "razorpay_order_id": response.orderId,
+        "razorpay_signature": response.signature,
+      }),
+      options: dio.Options(
+        contentType: 'application/json',
+        headers: {
+          'Authorization': 'Bearer ${authController.userProfile.value!.token}',
+        },
+      ),
+    );
+
+    Map orderData = orderResponse.data;
+
+    authController.userProfile.value!.premiumAccount = orderData['identifiers'][0]['id'];
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
-    // Do something when payment fails
+    Fluttertoast.showToast(msg: 'Payment failed');
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
@@ -107,10 +132,41 @@ class _SettingsState extends State<Settings> {
           });
     }
 
-    void handlePayment() {
-      if (authController.userProfile.value!.premiumAccount.isNotEmpty) {
+    void handlePayment() async {
+      if (authController.userProfile.value!.premiumAccount!.isNotEmpty) {
         Fluttertoast.showToast(msg: 'Already a premium member');
         return;
+      }
+
+      try {
+        final String orderBaseUrl = '${dotenv.env['BACKEND_URL']}/order';
+        final orderGenerateResponse = await dio.Dio().get(
+          '$orderBaseUrl/generate',
+          options: dio.Options(
+            contentType: 'application/json',
+            headers: {
+              'Authorization': 'Bearer ${authController.userProfile.value!.token}',
+            },
+          ),
+        );
+
+        Map orderGenerateData = orderGenerateResponse.data;
+
+        var options = {
+          'key': dotenv.env['RAZOR_PAY_KEY_ID'],
+          'amount': 10000, //in paise.
+          'name': 'Parbhat Sharma',
+          'order_id':
+              orderGenerateData['id'], // Generate order_id using Orders API
+          'description':
+              'Buy and get unlimited room members capability in your created rooms',
+          'timeout': 60, // in seconds
+          'prefill': {'contact': '8342873601', 'email': 'prabhat29ps@gmail.com'}
+        };
+
+        _razorpay.open(options);
+      } catch (e) {
+        Fluttertoast.showToast(msg: 'Payment failed');
       }
     }
 
