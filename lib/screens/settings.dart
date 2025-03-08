@@ -133,6 +133,14 @@ class _SettingsState extends State<Settings> {
     }
 
     void handlePayment() async {
+      // App not verified yet for Razor pay API key
+      bool disable = true;
+
+      if (disable) {
+        Fluttertoast.showToast(msg: 'Feature under development');
+        return;
+      }
+
       if (authController.userProfile.value!.premiumAccount!.isNotEmpty) {
         Fluttertoast.showToast(msg: 'Already a premium member');
         return;
