@@ -47,16 +47,12 @@ class SocketService extends GetxService {
     socket.connect();
 
     socket.onConnect((data) {
-      Fluttertoast.showToast(msg: 'Server Connected');
     });
 
     socket.onConnectError((data) {
-      log(data.toString());
-      Fluttertoast.showToast(msg: 'Failed to connect server');
     });
 
     socket.onerror((err) {
-      Fluttertoast.showToast(msg: err);
     });
 
     registerListeners();
