@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:icons_plus/icons_plus.dart';
+import 'package:wetube/screens/about.dart';
+import 'package:wetube/utils/launch_url.dart';
 import 'package:wetube/widgets/google_auth_button.dart';
 
 class Auth extends StatefulWidget {
@@ -66,7 +68,13 @@ class _AuthState extends State<Auth> {
                     spacing: 20,
                     children: [
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) => About(),
+                            ),
+                          );
+                        },
                         child: Column(
                           spacing: 10,
                           children: [
@@ -76,7 +84,9 @@ class _AuthState extends State<Auth> {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          openUrl('https://github.com/parbhat-cpp/wetube-app');
+                        },
                         child: Column(
                           spacing: 10,
                           children: [
