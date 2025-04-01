@@ -7,6 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:wetube/controllers/auth_controller.dart';
+import 'package:wetube/entities/user_profile.dart';
 
 class UserService extends GetxService {
   final String userProfileBaseUrl = '${dotenv.env['BACKEND_URL']}/user';
@@ -29,14 +30,17 @@ class UserService extends GetxService {
 
       Map resBody = response.data;
 
-      authController.setUserProfile(
-        id,
-        resBody['full_name'],
-        resBody['username'],
-        resBody['avatar_url'],
-        resBody['premium_account'],
-        token,
+      UserProfile user = UserProfile(
+        avatarUrl: resBody['avatar_url'],
+        fullname: resBody['full_name'],
+        id: id,
+        premiumAccount: resBody['premium_account'],
+        token: token,
+        username: resBody['username'],
       );
+
+      // update user info
+      authController.userProfile.value = user;
     } catch (e) {
       Fluttertoast.showToast(
         msg: e.toString(),
