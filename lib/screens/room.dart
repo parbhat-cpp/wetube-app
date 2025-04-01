@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:wetube/controllers/auth_controller.dart';
 import 'package:wetube/entities/user_profile.dart';
 import 'package:wetube/main.dart';
@@ -12,12 +13,12 @@ import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 class RoomStateManager extends GetxController {
   Rx<TextEditingController> chatController = TextEditingController().obs;
   YoutubePlayerController youtubePlayerController = YoutubePlayerController(
-      initialVideoId: '1BfCnjr_Vjg',
-      flags: YoutubePlayerFlags(
-        autoPlay: false,
-        mute: false,
-      ),
-    );
+    initialVideoId: '1BfCnjr_Vjg',
+    flags: YoutubePlayerFlags(
+      autoPlay: false,
+      mute: false,
+    ),
+  );
 
   void setChatText(String text) {
     chatController.value.text = text;
@@ -61,6 +62,39 @@ class Room extends StatelessWidget {
       roomStateManager.setChatText('');
     }
 
+    void handleExitRoom() {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) => Dialog(
+          child: Padding(
+            padding: EdgeInsets.all(10.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const Text(
+                  'Do you want to exit the room?',
+                  style: TextStyle(
+                    fontSize: 20.0,
+                  ),
+                ),
+                ElevatedButton(
+                  onPressed: socketService.exitRoom,
+                  child: const Text('Yes'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('No'),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
     return SafeArea(
       child: Scaffold(
         key: _scaffoldKey,
@@ -68,7 +102,7 @@ class Room extends StatelessWidget {
           automaticallyImplyLeading: false,
           leading: Builder(builder: (BuildContext context) {
             return IconButton(
-              onPressed: socketService.exitRoom,
+              onPressed: handleExitRoom,
               icon: const Icon(Icons.arrow_back),
             );
           }),
@@ -168,11 +202,37 @@ class Room extends StatelessWidget {
             child: Padding(
               padding: EdgeInsets.all(5.0),
               child: ListView.builder(
-                  itemCount: socketService.roomAttendees.length,
+                  itemCount: socketService.roomAttendees.length + 1,
                   itemBuilder: (context, index) {
+                    if (index == 0) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10.0,
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Room ID: ${socketService.currentRoomId}',
+                              style: TextStyle(fontSize: 18.0),
+                            ),
+                            IconButton(
+                              onPressed: () {
+                                Share.share(
+                                  socketService.currentRoomId.value,
+                                  subject: 'Share room',
+                                );
+                              },
+                              icon: Icon(Icons.share),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
                     Map<String, dynamic> admin = socketService.roomAttendees[0];
                     Map<String, dynamic> currentUser =
-                        socketService.roomAttendees[index];
+                        socketService.roomAttendees[index - 1];
 
                     String username =
                         currentUser['username'] ?? currentUser['full_name'];
