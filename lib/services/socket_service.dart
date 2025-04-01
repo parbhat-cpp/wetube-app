@@ -293,6 +293,7 @@ class SocketService extends GetxService {
   @override
   void onClose() {
     roomStateManager.destroy();
+    socket.close();
     super.onClose();
   }
 }

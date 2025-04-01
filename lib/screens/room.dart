@@ -79,7 +79,10 @@ class Room extends StatelessWidget {
                   ),
                 ),
                 ElevatedButton(
-                  onPressed: socketService.exitRoom,
+                  onPressed: () {
+                    roomStateManager.destroy();
+                    socketService.exitRoom();
+                  },
                   child: const Text('Yes'),
                 ),
                 ElevatedButton(
