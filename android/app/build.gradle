@@ -39,7 +39,7 @@ android {
 
     signingConfigs {
         release {
-            storeFile file("keystore.jks")
+            storeFile file("release-keystore.jks")
             storePassword localProperties.getProperty("KEYSTORE_PASSWORD")
             keyAlias "wetube-release"
             keyPassword localProperties.getProperty("KEY_PASSWORD")
